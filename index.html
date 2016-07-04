@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>MWO: Faction Play Data Portal</title>
+
+    <link href="dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="starter-template.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.4/css/jquery.dataTables.css">
+
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="index.html">MWO:Faction Play Portal</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li id="cwtableli"><a id="cwtable" href="#">Planet Data Table</a></li>
+	    <!--<li id="cwowngli"><a id="cwowng" href="#">Faction Progress Graph</a></li>-->
+	    <li id="cwgainli"><a id="cwgain" href="#">Faction Progress Graph</a></li>
+	    <li id="cwunigli"><a id="cwunig" href="#">Unit Tag Bar Chart</a></li>		
+	    <!--<li id="linksli"><a id="links" href="#">CW App Links</a></li>-->
+            <li id="contactli"><a id="contact" href="#">Contact</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+    <div class="row">
+    <div id="content" class="col-md-8">
+     <br>
+      <div class="jumbotron">
+        <h1>Data Resources <small> for faction play</small></h1>
+        <p>This site presents several different views of the data made available via the mwo public API at <a href="https://static.mwomercs.com/data/cw/mapdata.json">https://static.mwomercs.com/data/cw/mapdata.json</a>.</p>
+	<p>There are tons of other projects also making use of this data, please check them out on the sidebar -----> </p>
+      </div><!-- /.jumbo -->
+      <div class="panel panel-default">
+        <div class="panel-heading">Popular Posts and News Sources</div>
+	<div class="panel-body">
+	    <span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span><a href="http://www.reddit.com/r/OutreachHPG/search?q=BATTLE+REPORT&sort=new&restrict_sr=on&t=all"> Battle Reports</a> on Reddit by <small><a href="http://www.reddit.com/user/StillRadioactive">/u/StillRadioactive</a><br></small>
+	    <span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span><a href="http://www.comstarchronicle.com/category/mwo-news/community-warfare/"> Comstar Chronicles CW Newsletter</a> by <small><a href="http://mwomercs.com/forums/user/42298-dracol/">Dracol</a></small><br>
+	    <span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span><a href="http://www.reddit.com/r/OutreachHPG/"> Outreach HPG</a><br>
+	    <span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span><a href="http://mwomercs.com/forums/forum/307-community-warfare/"> Official Community Warfare Forums</a><br>
+	</div>
+     </div>
+      <div class="row">
+         <div class="col-xs-6 col-md-4">
+             <a id="tablethumb" href="#" class="thumbnail">
+             <img src="table.png" alt="">
+            </a>
+	</div>
+	<div class="col-xs-6 col-md-4">
+             <a id="tagsthumb" href="#" class="thumbnail">
+             <img src="tags.png" alt="">
+            </a>
+	</div>
+        <div class="col-xs-6 col-md-4">
+             <a id="wongraphthumb" href="#" class="thumbnail">
+             <img src="wongraph.png" alt="">
+            </a>
+         </div>
+     </div>
+      <!--<div class="alert alert-warning">
+	<p>Site is still under maintenance, you might notice some pages acting strangely as code is adjusted.</p>
+     </div>-->
+    </div><!-- /.col9 -->
+         <br><div id="sidebar" class="col-md-4 alert alert-info">
+      	    <!-- <div id="sidebar">-->
+	    </div><!-- /.sidebar -->
+         </div><!-- /.col3 -->
+    </div><!-- /.row -->
+    </div><!-- /.container -->
+
+
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/include/flot/jquery.flot.js"></script>
+    <script type="text/javascript" src="/include/flot/jquery.flot.time.js"></script>
+    <script type="text/javascript" src="/include/flot/jquery.flot.axislabels.js"></script>
+    <script src="dist/js/bootstrap.min.js"></script>
+    <script src="/include/combodate.js"></script>
+    <script src="/include/moment.js"></script>
+    <script src="/include/date.js"></script>
+    <script src="/include/underscore-min.js"></script>
+    <script src="/cw/main.js"></script>
+  </body>
+</html>

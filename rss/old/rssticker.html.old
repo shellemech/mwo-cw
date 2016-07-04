@@ -1,0 +1,15 @@
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
+<script src="/include/combodate.js"></script>
+<script src="/include/moment.js"></script>
+<script src="/include/date.js"></script>
+<script src="/cw/rss/tickerscript.js"></script>
+<title>MWO Community Warfare Daily Report</title>
+</head>
+<div id="title">MWO Community Warfare Daily Report - </div>
+<div class="item" id="taken">Planets Taken<br></div>
+<div class="item" id="defended">Planets Defended<br></div>
+<div class="item" id="noaction">No Action<br></div>
+</html>

@@ -1,0 +1,293 @@
+		<style type='text/css'>
+			img {
+				margin-right: 5px;
+				margin-left: 1px;
+			}    
+		</style>
+		<script type='text/javascript'> 
+			$(function(){
+				$('#loading').load('loading.html');
+				// Global vars
+				//$.ajaxSetup({'async': true});
+				var myday = moment(Date.parse("10/01/2015 05:15")).unix();
+				var changeday = moment(Date.parse("20/01/2015 05:15")).unix();
+				var today = moment().utc().unix();
+				var gdays = [];
+				var planets = {day: 0, name: "", owner: "", invader: "", unit: "", contested: 0 };
+				var plandaystoday = [];
+				var plandaysyest = [];
+				var davplot = [],
+					kurplot = [],
+					liaplot = [],
+					marplot = [],
+					steplot = [],
+					rasplot = [],
+					wolplot = [],
+					jadplot = [],
+					ghoplot = [],
+					smoplot = [];
+				var dav = 10,
+					kur = -6,
+					lia = -7,
+					mar = 1,
+					ste = -5,
+					ras = -4,
+					wol = 0,
+					jad = 4,
+					gho = 7,
+					smo = 0;
+				var dayscount=0;
+				
+				// Get days master list
+				while (myday < today) {
+					gdays.push(myday);
+					myday += 86400;
+				}
+
+				// Now get the data, apply logic, and graph it out
+				
+				// Get data from MWO and count up owners, then draw the graph
+				//$.ajaxSetup({'async': false});
+				getData("T05-15.json", "T04-15.json");
+
+				// Getting all ze data
+				// Json calls
+				function getData(after, before) {
+					if (dayscount < gdays.length) {
+						var curday=gdays[dayscount];
+						// Get planet data for today and yesterday
+						var thisdate = new Date(curday * 1000);
+						var thisday = addZero(thisdate.getDate());
+						var thismonth = addZero(thisdate.getMonth()+1);
+						var thisyear = thisdate.getFullYear()+1035;
+						var urldate = "https://static.mwomercs.com/data/cw/mapdata-"+thisyear+"-" + thismonth + "-" + thisday + after;
+						console.log(urldate);
+						var urldate2 = "https://static.mwomercs.com/data/cw/mapdata-"+thisyear+"-" + thismonth + "-" + thisday + before;
+						
+						$.getJSON(urldate,  function (data){
+							//console.log(curday);
+							$.each(data, function (i, val) {
+								if (i <2440){ // get an undefined error without this, weird
+									planets = { day:curday, name:val.name, owner:val.owner.name, invader:val.invading.name, unit:val.unit.name, contested:val.contested };
+									plandaystoday.push(planets);
+								}
+							}); // Done each
+						
+							$.getJSON(urldate2,  function (data2){
+								//console.log(curday);
+								$.each(data2, function (i, val) {
+									if (i <2440){ // get an undefined error without this, weird
+										planets = { day:curday, name:val.name, owner:val.owner.name, invader:val.invading.name, unit:val.unit.name, contested:val.contested };
+										//if (val.contested=='1') {
+											plandaysyest.push(planets);
+										//}
+									}
+								}); // Done each
+								var yestmp = [];
+								var todtmp = [];
+								//console.log("length:"+plandaysyest.length);
+								$.each(plandaysyest, function (idx, y) {
+									if (y.day==curday){ //console.log("py.day ==cur");
+										yestmp.push(y);
+									}
+								});
+								$.each(plandaystoday, function (idx, t) {
+									if (t.day==curday){ //console.log("pt.day ==cur");
+										todtmp.push(t);
+									}
+								});
+						
+								var yessort = _.sortBy( yestmp, 'name' );
+                                                                var todsort =  _.sortBy( todtmp, 'name' );
+
+								$.each(yessort, function (i, py) {
+									if (py.contested=='1') {
+										if ((py.owner!=todsort[i].owner)) { 
+													//console.log(py.owner+" does not equal "+pt.owner);
+													if (todsort[i].owner == "Davion") {
+														dav++; 
+													}
+													if (todsort[i].owner == "Liao") {
+														lia++; 
+													}
+													if (todsort[i].owner == "Marik") {
+														mar++; 
+													}
+													if (todsort[i].owner == "Steiner") {
+														ste++; 
+													}
+													if (todsort[i].owner == "Rasalhague") {
+														ras++; 
+													}
+													if (todsort[i].owner == "Kurita") {
+														kur++; 
+													}
+													if (todsort[i].owner == "Wolf") {
+														wol++; 
+													}
+													if (todsort[i].owner == "Jade Falcon") {
+														jad++; 
+													}
+													if (todsort[i].owner == "Ghost Bear") {
+														gho++;
+													}
+													if (todsort[i].owner == "Smoke Jaguar") {
+														smo++; 
+													}
+													if (py.owner == "Davion") {
+														dav--; 
+													}
+													if (py.owner == "Liao") {
+														lia--; 
+													}
+													if (py.owner == "Marik") {
+														mar--; 
+													}
+													if (py.owner == "Steiner") {
+														ste--; 
+													}
+													if (py.owner == "Rasalhague") {
+														ras--; 
+													}
+													if (py.owner == "Kurita") {
+														kur--; 
+													}
+													if (py.owner == "Wolf") {
+														wol--; 
+													}
+													if (py.owner == "Jade Falcon") {
+														jad--; 
+													}
+													if (py.owner == "Ghost Bear") {
+														gho--; 
+													}
+													if (py.owner == "Smoke Jaguar") {
+														smo--; 
+													}
+												}
+											}
+										});
+							//		}
+							//	});
+							
+								// Build owner graph arrays
+								//console.log(curday, dav, kur, lia, mar, ste, ras, wol, jad, gho, smo);
+								davplot.push([curday*1000, dav]);
+								kurplot.push([curday*1000, kur]);
+								liaplot.push([curday*1000, lia]);
+								marplot.push([curday*1000, mar]);
+								steplot.push([curday*1000, ste]);
+								rasplot.push([curday*1000, ras]);
+								wolplot.push([curday*1000, wol]);
+								jadplot.push([curday*1000, jad]);
+								ghoplot.push([curday*1000, gho]);
+								smoplot.push([curday*1000, smo]);
+										
+								// Draw the graph
+								drawGain();
+								hideloading();
+								dayscount++;
+								//console.log("dayscount: "+dayscount);
+								if (curday < changeday) {
+				                                        getData("T05-15.json", "T04-15.json");
+                                				}
+				                                else {
+                                				        getData("T06-15.json", "T05-15.json");
+				                                        getData("T15-15.json", "T14-15.json");
+				                                        getData("T23-15.json", "T22-15.json");
+				                                }
+							});  // Done json
+						});  // Done json
+						
+					}//}); // Done each day loop
+					//compareDays();
+				//console.log(plandaystoday.length);	
+				} // Close getData
+					
+				
+				// Begin the graphing
+				// Faction owned planets graph
+				function drawGain(){
+					// Set up options and data for graph
+					var mydata = [	{ label: "Davion", data: davplot, color: "yellow", hoverable: true }, 
+						{ label: "Kurita", data: kurplot, color: "firebrick", hoverable: true }, 
+						{ label: "Liao", data: liaplot, color: "forestgreen", hoverable: true }, 
+						{ label: "Marik", data: marplot, color: "mediumorchid", hoverable: true	}, 
+						{ label: "Steiner", data: steplot, color: "darkblue", hoverable: true }, 
+						{ label: "Rasalhague", data: rasplot, color: "lightseagreen", hoverable: true }, 
+						{ label: "Wolf", data: wolplot, color: "crimson", hoverable: true }, 
+						{ label: "Jade Falcon", data: jadplot, color: "limegreen", hoverable: true }, 
+						{ label: "Ghost Bear", data: ghoplot, color: "royalblue", hoverable: true }, 
+						{ label: "Smoke Jaguar", data: smoplot, color: "lightslategrey", hoverable: true }
+					];
+//console.log(mydata);
+					var options = { 
+						series: { lines: { show: true }, 
+						points: { show: true }	}, 
+						axisLabels: { show: true },
+						xaxis: { mode: "time", timeformat: "%d/%m", tickSize: [24, 'hour'], axisLabel: 'Day' },
+						yaxes: [{ tickSize: 5,  axisLabel: 'Planets Won/Lost', position: "left" },{ show: true, tickSize: 5, axisLabel: 'Planets Won/Lost', position: "right" }],
+						grid: { hoverable: true, clickable: true, backgroundColor: { colors: ["#F8F8F8", "#E0E0E0"] }, borderWidth: { top: 1, right: 1, bottom: 2, left: 2 } },
+						legend: { labelFormatter: function(label, series) {
+							if (label == "Davion") { return '<img src="https://static.mwomercs.com/img/house/davion.png" width="32" height="32">'; }
+							if (label == "Kurita") { return '<img src="https://static.mwomercs.com/img/house/kurita.png" width="32" height="32">'; }
+							if (label == "Liao") { return '<img src="https://static.mwomercs.com/img/house/liao.png" width="32" height="32">'; }
+							if (label == "Marik") {	return '<img src="https://static.mwomercs.com/img/house/marik.png" width="32" height="32">'; }
+							if (label == "Steiner") { return '<img src="https://static.mwomercs.com/img/house/steiner.png" width="32" height="32">'; }
+							if (label == "Rasalhague") { return '<img src="https://static.mwomercs.com/img/house/rasalhague.png" width="32" height="32">'; }
+							if (label == "Wolf") { return '<img src="https://static.mwomercs.com/img/house/clanwolf.png" width="32" height="32">'; }
+							if (label == "Jade Falcon") { return '<img src="https://static.mwomercs.com/img/house/clanjadefalcon.png" width="32" height="32">'; }
+							if (label == "Ghost Bear") { return '<img src="https://static.mwomercs.com/img/house/clanghostbear.png" width="32" height="32">'; }
+							if (label == "Smoke Jaguar") { return '<img src="https://static.mwomercs.com/img/house/clansmokejaguar.png" width="32" height="32">'; }
+						},
+						labelBoxBorderColor: "black", position: "nw" , noColumns: 10, margin: 2, backgroundColor: null, backgroundOpacity: 0 }
+					};
+
+					// Draw the thing
+					var plot = $.plot("#factionwins", mydata, options);
+					options.yaxes[1].max = plot.getYAxes()[0].max;
+					options.yaxes[1].min = plot.getYAxes()[0].min;
+					$.plot("#factionwins", mydata, options);
+					$("<div id='tooltip'></div>").css({ position: "absolute", display: "none", "border-radius": "5px", border: "2px solid #000", padding: "2px", "background-color": "white", opacity: 0.90, "font-size": "11px"}).appendTo("body");
+					$("#factionwins").bind("plothover", function (event, pos, item) {
+						if (item) {
+							var x = $.plot.formatDate(new Date(item.datapoint[0]), "%d/%m/%y"), y = item.datapoint[1].toFixed(0);
+							$("#tooltip").html(item.series.label + " had taken " + y + " planets by the " + x).css({top: item.pageY-35, left: item.pageX+5}).fadeIn(200);
+						} else {
+							$("#tooltip").hide();
+						}	
+					});
+				} // End draw faction gained planets
+				
+
+				// Lil function to add zeros
+				function addZero(i) {
+					if (i < 10) {
+						i = "0" + i;
+					}
+					return i;
+				}
+				function hideloading() {
+					$('#loading').hide();
+					$('#factionwins').show();
+				}
+				
+			}); //End dom ready
+
+		</script>
+		
+<!--<div class="page-header">-->
+       <!-- <h1> Planets Won/Lost Per Faction <small> historical view</small></h1>-->
+<!--</div>-->
+<!--<div id="loading"></div>-->
+<br>
+<div class="panel panel-danger">
+<!--<div id="factionwins" style="width:900px;height:500px"></div>-->
+
+<div class="panel-heading">
+<p> This graph was coded when CW was first released - it represented a daily count of planets gained minus planets lost per faction. The data was collected from the 04:15 and 05:15 JSON file provided by mwomercs.com when there was just one ceasefire per day.</p> 
+<p> CW has changed a lot since then, and the code no longer works. Unfortunately with my free time being spent on MRBC I have no time to devote to getting this working again. </p> 
+<p> As a legacy page I leave here the first week of CW gains, as the data was collected in 2014: </p>
+</div>
+<img src="wongraph.png" alt="">
+<br>

@@ -1,0 +1,151 @@
+		<script>
+
+			$(document).ready(function () {
+				
+				$('#loading').load('loading.html');				
+	
+				// Get data, then display it in the table
+				getData("https://static.mwomercs.com/data/cw/mapdata.json");
+
+				// Date picker
+				$('#datetime24').combodate({
+					minuteStep: 15,
+					minYear: 2014
+				});
+
+				// Date getter
+				$("#subDate").click(function (e) {
+					showloading();
+					$('#errormsg').hide();
+					var thisdate = Date.parse($('#datetime24').combodate('getValue'));
+					var thisday = addZero(thisdate.getDate());
+					var thismonth = addZero(thisdate.getMonth()+1);
+					var thisyear = thisdate.getFullYear()+1035;
+					var thishour = addZero(thisdate.getHours());
+					var thisminute = addZero(thisdate.getMinutes());
+					var newurl="https://static.mwomercs.com/data/cw/mapdata-"+thisyear+"-"+thismonth+"-"+thisday+"T"+thishour+"-"+thisminute+".json";
+
+					// Empty table and reinit
+					$('#planets').DataTable().destroy();
+					$('#data').empty();
+					getData(newurl);
+				});
+
+
+			});
+
+			function addZero(i) {
+				if (i < 10) {
+					i = "0" + i;
+				}
+				return i;
+				}
+			
+			function hideloading() {
+				$('#loading').hide();
+                                $('#tablepanel').show();
+			}
+			function showloading() {
+                                $('#loading').show();
+                                $('#tablepanel').hide();
+                        }
+			
+			function drawTable() {
+                                $('#planets').dataTable({
+                                        "pageLength": 15,
+                                        "order": [[ 6, "desc" ]],
+                                        "processing": false,
+                                        "lengthMenu": [
+                                                [15, 50, 500, -1],
+                                                [15, 50, 500, "All"]
+                                        ]
+                                });
+			}
+
+
+			function getData(dataurl) {
+			//	$.ajaxSetup({'async': false});
+				$.getJSON(dataurl, function (data) {
+					$('.timestamp').text(data.generated);
+						$.each(data, function (idx, val) {
+							if (idx <2440){ // get an undefined error without this, weird
+								var tr = $(document.createElement('tr'));
+								if (val.contested == '1') {
+									tr.addClass('danger');
+								}
+
+								// Add rows (id, name, owner, attacker, unit tag, contested and score)
+								tr.append($(document.createElement('td')).text(idx));
+								tr.append($(document.createElement('td')).text(val.name));
+
+								if (val.owner.name == 'None') {
+									tr.append($(document.createElement('td')).text(val.owner.name));
+								} else {
+									tr.append($(document.createElement('td')).html('<img src="' + val.owner.icon + '" width="16" height="16"> ' + val.owner.name));
+								}
+
+								if (val.invading.name == 'None') {
+									tr.append($(document.createElement('td')).text(val.invading.name));
+								} else {
+									tr.append($(document.createElement('td')).html('<img src="' + val.invading.icon + '" width="16" height="16"> ' + val.invading.name));
+								}
+								tr.append($(document.createElement('td')).text(val.unit.name));
+								tr.append($(document.createElement('td')).text(val.contested));
+
+								// Count territories
+								var longbin = "";
+								var search1 = "1";
+								for (var i = 0; i < 7; i++) {
+									longbin = longbin + parseInt(val.territories[i], 10).toString(2);
+								}
+								for (var i = count = 0; i < longbin.length; count += +(search1 === longbin[i++]));
+								tr.append($(document.createElement('td')).text(Math.round((count/val.total_territories)*100)+"%"));
+								tr.append($(document.createElement('td')).text(count +"/"+val.total_territories));
+								$('#data').append(tr);
+
+							}
+						});
+						drawTable();
+		                                hideloading();
+					}) .error(function() { 
+						hideloading();
+						drawTable();
+						$('#errormsg').show();
+						});
+				// and finally show the table
+				//setTimeout(function () { hideloading();	}, 1500);
+				//hideloading();
+			}
+						
+
+									</script>
+									<div class="page-header">
+									<h1> Planet Data Table <small> all data, searchable</small></h1>
+									</div>
+									<div id="loading"></div>
+									<div id="errormsg" class="alert alert-danger" style="display: none;">Sorry, there doesn't seem to be any data for that day! Please try again.</div>
+									<div id="tablepanel" style="display: none;">
+											<table class="display compact" cellspacing="0" width="100%" id="planets">
+												<thead>
+													<tr>
+														<th>Planet ID</th>
+														<th>Name</th>
+														<th>Owner</th>
+														<th>Invader</th>
+														<th>Unit Tag</th>
+														<th>Contested</th>
+														<th>Attacker Wins</th>
+														<th>Territories</th>
+													</tr>
+												</thead>
+												<tbody id="data"></tbody>
+												<tfoot></tfoot>
+											</table>
+											<br>Data generated <span class="timestamp"></span>
+
+											<br>Select older data:
+											<input type="text" id="datetime24" data-format="DD-MM-YYYY HH:mm" data-template="DD / MM / YYYY     HH : mm" name="datetime" value="16-12-2014 18:30">
+											<button type="submit" id="subDate">Go</button>
+											<br><br><br>
+									</div>
+

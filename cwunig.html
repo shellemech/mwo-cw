@@ -1,0 +1,152 @@
+<script type='text/javascript'> 
+	$(function(){
+		$('#loading').load('loading.html');
+		// Global vars
+		var planets = { name: "", owner: "", invader: "", unit: "", contested: 0 };
+		var units = [];
+		var plandaysu = [];
+		var unitplot = [];
+		var unittick = [];
+										
+		// Now get the data, apply logic, and graph it out
+		
+		getuData();
+	
+		// Getting all ze data
+		// Json calls
+		function getuData() {
+			// Get planet data for current day
+			var urllive = "https://static.mwomercs.com/data/cw/mapdata.json";
+//			$.ajaxSetup({'async': false});		
+			$.getJSON(urllive,  function (data){
+				$.each(data, function (id, val) {
+					if (id <2440){ // get an undefined error without this, weird
+						planets = { name:val.name, owner:val.owner.name, invader:val.invading.name, unit:val.unit.name, contested:val.contested };
+						plandaysu.push(planets);
+					} 
+				}); // Done each
+			calcUnits()
+	                drawUnits();
+        	        hideloading();
+			}); // Done json
+		} // Close getData
+						
+						
+		// Logic on ze data
+
+		// Get data we want - count of unit tags					
+		function calcUnits() {
+			// vars
+			var allunits = [];
+			var allnames = [];
+			var unitplottmp = [];
+			var unitplottmp2 = [];
+
+			// Loop over planet data to get unique tags
+			$.each(plandaysu, function (id, pla) {
+				if (pla.unit!="") {
+					allunits.push(pla.unit); 
+				}
+			}); // Done latest planet list
+
+			// Loop to remove dupes
+			$.each(allunits, function(i, el){
+				if($.inArray(el, units) === -1) units.push(el);
+			});
+
+			// Loop over planet data again to count per unit
+			$.each(units, function (i, unit) {
+				var countu = 0;
+				$.each(plandaysu, function (id, pla) {
+					if (pla.unit==unit) {
+					countu++;
+					}
+				}); // Done latest planet list
+				
+				// Build unit graph arrays
+				unitplottmp.push(countu);
+				unitplottmp2.push([countu, i]);
+				allnames.push([i, unit]);
+				//console.log(i, unit,  countu);
+				
+			}); // Done each unit					
+			
+			// Sort by count
+			unitplottmp2.sort( function(a,b) {
+					if (a[0] == b[0])
+					return b[1] < a[1] ? -1 : 1;
+					return b[0] < a[0] ? 1 : -1;
+					}
+					);
+			unitplottmp.sort(function(a, b){return a-b});
+			$.each(unitplottmp, function (i, ut) {
+				unitplot.push([ut,i]);
+			});
+
+			$.each(unitplottmp2, function (i, up) {
+				$.each(allnames, function (j, an) {
+					if (an[0]==up[1]){ 
+						unittick.push([i, an[1]]);
+						//console.log(an[0], an[1]);
+					}
+				}); 
+			}); 
+		} // Close calcUnits
+		
+		
+		// Begin the graphing
+		
+		// Unit Tags graph
+		function drawUnits(){
+			// Set up options and data for graph
+			var unitdata = [	{ label: "Tags", data: unitplot, color: "#E8E800", hoverable: true }];
+			var unitoptions = { 
+				series: { bars: { show: true, horizontal: true, align: "center", fillColor: { colors: [{ opacity: 0.5 }, { opacity: 1}] }, barWidth: 0.5 }, 
+				points: { show: false }	}, 
+				axisLabels: { show: true },
+				yaxis: { axisLabel: 'Unit', ticks: unittick },
+				xaxis: { tickSize: 1,  axisLabel: 'Planets Tagged' },
+				grid: { hoverable: true, clickable: true, backgroundColor: { colors: ["#4F4F4F", "#171717"] }, borderWidth: { top: 1, right: 1, bottom: 2, left: 2 } },
+				legend: { show :false}
+			};
+
+			// Draw the thing
+			var plot = $.plot("#unittags", unitdata, unitoptions);
+			$.plot("#unittags", unitdata, unitoptions);
+			$("<div id='tooltip'></div>").css({ position: "absolute", display: "none", "border-radius": "5px", border: "2px solid #5E5E5E", padding: "2px", "background-color": "white", opacity: 0.90, "font-size": "11px"}).appendTo("body");
+			$("#unittags").bind("plothover", function (event, pos, item) {
+				if (item) {
+					var x = item.datapoint[0], y = item.datapoint[1];
+					$("#tooltip").html(item.series.yaxis.ticks[y].label + "<br>" + x + " planet(s)").css({top: item.pageY-30, left: item.pageX+15}).fadeIn(200);
+				} else {
+					$("#tooltip").hide();
+				}	
+			});
+		} // End draw unit tagged planets
+
+		// Lil function to add zeros
+		function addZero(i) {
+			if (i < 10) {
+				i = "0" + i;
+			}
+			return i;
+		}
+		function hideloading() {
+			$('#loading').hide();
+			$('#unittags').show();
+		}
+	}); //End dom ready
+
+</script>
+
+<div class="page-header">
+        <h1> Planets Tagged Per Unit <small> today's view</small></h1>
+</div>
+<div id="loading"></div>
+<div id="unittags" style="width:900px;height:1100px"></div>
+
+<h3> About this graph</h3>
+<p>This graph shows the current planets that are "tagged" by a unit. This data is collected from the live JSON from mwomercs.com, but the tags are only currently updated once a day after the ceasefire.</p>
+<br>
+<br>
+<br>
